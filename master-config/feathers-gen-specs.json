@@ -1,0 +1,41 @@
+{
+  "options": {
+    "ver": "1.0.0",
+    "inspectConflicts": false,
+    "semicolons": false,
+    "freeze": [],
+    "ts": false
+  },
+  "app": {
+    "environmentsAllowingSeedData": "",
+    "seedData": false,
+    "name": "master-config",
+    "description": "Project master-config",
+    "src": "src",
+    "packager": "npm@>= 3.0.0",
+    "providers": [
+      "rest",
+      "socketio"
+    ]
+  },
+  "services": {
+    "masterConfig": {
+      "name": "masterConfig",
+      "nameSingular": "masterConfig",
+      "subFolder": "",
+      "fileName": "master-config",
+      "adapter": "mongoose",
+      "path": "/master-config",
+      "isAuthEntity": false,
+      "graphql": false
+    }
+  },
+  "hooks": {},
+  "connections": {
+    "mongoose": {
+      "database": "mongodb",
+      "adapter": "mongoose",
+      "connectionString": "mongodb://localhost:27017/master_config"
+    }
+  }
+}
