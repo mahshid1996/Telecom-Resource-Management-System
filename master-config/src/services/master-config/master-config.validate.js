@@ -19,7 +19,86 @@ let base = merge({},
     description: "MasterConfig database.",
     required: [],
     uniqueItemProperties: [],
-    properties: {}
+    properties: {
+      id: {
+        type: "string"
+      },
+      href: {
+        type: "string"
+      },
+      name: {
+        type: "string"
+      },
+      description: {
+        type: "string"
+      },
+      status: {
+        type: "string",
+        enum: [
+          "Active",
+          "InActive"
+        ]
+      },
+      code: {
+        type: "string"
+      },
+      type: {
+        type: "string"
+      },
+      baseType: {
+        type: "string"
+      },
+      batchStart: {
+        type: "string"
+      },
+      currentBatch: {
+        type: "string"
+      },
+      relatedParty: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            role: {
+              type: "string"
+            },
+            name: {
+              type: "string"
+            },
+            email: {
+              type: "string"
+            },
+            phone: {
+              type: "string"
+            }
+          }
+        }
+      },
+      configCharacteristics: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            name: {
+              type: "string"
+            },
+            code: {
+              type: "string"
+            },
+            valueType: {
+              type: "string"
+            },
+            configCharacteristicsValues: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {}
+              }
+            }
+          }
+        }
+      }
+    }
   },
   // !end
   // !code: base_more // !end

@@ -9,7 +9,41 @@ const mongoose = require('mongoose')
 
 let moduleExports = merge({},
   // !<DEFAULT> code: model
-  {},
+  {
+    href: String,
+    name: String,
+    description: String,
+    status: {
+      type: String,
+      enum: [
+        "Active",
+        "InActive"
+      ]
+    },
+    code: String,
+    type: String,
+    baseType: String,
+    batchStart: String,
+    currentBatch: String,
+    relatedParty: [
+      {
+        role: String,
+        name: String,
+        email: String,
+        phone: String
+      }
+    ],
+    configCharacteristics: [
+      {
+        name: String,
+        code: String,
+        valueType: String,
+        configCharacteristicsValues: [
+          {}
+        ]
+      }
+    ]
+  },
   // !end
   // !code: moduleExports // !end
 )
