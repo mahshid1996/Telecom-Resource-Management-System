@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+service MasterConfigService {
+  rpc GetMasterConfig (MasterConfigRequest) returns (MasterConfigResponse);
+  rpc CreateMasterConfig (CreateMasterConfigRequest) returns (MasterConfigResponse);
+}
+
+message MasterConfigRequest {
+  string code = 1;
+}
+
+message CreateMasterConfigRequest {
+  MasterConfig config = 1;
+}
+
+message MasterConfigResponse {
+  MasterConfig config = 1;
+}
+
+message MasterConfig {
+  string id = 1;
+  string code = 2;
+  string name = 3;
+  string description = 4;
+  string status = 5;
+  string type = 6;
+  string baseType = 7;
+  string batchStart = 8;
+  string currentBatch = 9;
+  repeated RelatedParty relatedParty = 10;
+  repeated ConfigCharacteristic configCharacteristics = 11;
+}
+
+message RelatedParty {
+  string role = 1;
+  string name = 2;
+  string email = 3;
+  string phone = 4;
+}
+
+message ConfigCharacteristic {
+  string name = 1;
+  string code = 2;
+  string valueType = 3;
+  repeated ConfigCharacteristicValue configCharacteristicsValues = 4;
+}
+
+message ConfigCharacteristicValue {
+  string valueType = 1;
+  string value = 2;
+}

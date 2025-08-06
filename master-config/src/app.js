@@ -1,97 +1,110 @@
+const express = require('express');
+const { swaggerUi, specs } = require('./swagger');
+const MasterConfig = require('./model');
+const { masterConfigSchema } = require('./validation.js');
+const app = express();
+app.use(express.json());
 
-// Configure Feathers app. (Can be re-generated.)
-// !code: preface // !end
-const path = require('path')
-const compress = require('compression')
-const cors = require('cors')
-const helmet = require('helmet')
-const logger = require('./logger')
+/**
+ * @swagger
+ * /master-config:
+ *   get:
+ *     summary: Get all configs
+ *     parameters:
+ *       - in: query
+ *         name: code
+ *         schema:
+ *           type: string
+ *         description: Filter by code
+ *     responses:
+ *       200:
+ *         description: List of configs
+ *   post:
+ *     summary: Create a new config
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       201:
+ *         description: Created
+ */
 
-// !<DEFAULT> code: favicon_import
-const favicon = require('serve-favicon')
-// !end
+app.get('/master-config', async (req, res) => {
+  try {
+    const filter = req.query.code ? { code: req.query.code } : {};
+    const result = await MasterConfig.find(filter);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-const feathers = require('@feathersjs/feathers')
-const configuration = require('@feathersjs/configuration')
-const express = require('@feathersjs/express')
-const socketio = require('@feathersjs/socketio')
 
-const middleware = require('./middleware')
-const services = require('./services')
-const appHooks = require('./app.hooks')
-const channels = require('./channels')
-const generatorSpecs = require('../feathers-gen-specs.json')
+app.post('/master-config', async (req, res) => {
+  const { error } = masterConfigSchema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
 
-const mongoose = require('./mongoose')
-// !code: imports // !end
-// !code: init // !end
+  try {
+    const config = new MasterConfig(req.body);
+    const saved = await config.save();
+    res.status(201).json(saved);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
 
-const app = express(feathers())
-// !code: use_start // !end
+/**
+ * @swagger
+ * /master-config/{id}:
+ *   get:
+ *     summary: Get config by id
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Config found
+ *       404:
+ *         description: Not found
+ *   delete:
+ *     summary: Delete config by id
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Deleted
+ */
 
-// Load app configuration
-app.configure(configuration())
-// !<DEFAULT> code: init_config
-app.set('generatorSpecs', generatorSpecs)
-// !end
+app.get('/master-config/:id', async (req, res) => {
+  try {
+    const config = await MasterConfig.findById(req.params.id);
+    if (!config) return res.status(404).json({ error: 'Not found' });
+    res.json(config);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-// Enable security, CORS, compression, favicon and body parsing
-app.use(helmet(
-  // !code: helmet_config // !end
-))
-app.use(cors(
-  // !code: cors_config // !end
-))
-app.use(compress(
-  // !code: compress_config // !end
-))
-app.use(express.json(
-  // !code: json_config // !end
-))
-app.use(express.urlencoded(
-  // !<DEFAULT> code: urlencoded_config
-  { extended: true }
-  // !end
-))
-// !<DEFAULT> code: use_favicon
-// Use favicon
-app.use(favicon(path.join(app.get('public'), 'favicon.ico')))
-// !end
-// !<DEFAULT> code: use_static
-// Host the public folder
-app.use('/', express.static(app.get('public')))
-// !end
-// !code: use_end // !end
+app.delete('/master-config/:id', async (req, res) => {
+  try {
+    const result = await MasterConfig.findByIdAndDelete(req.params.id);
+    if (!result) return res.status(404).json({ error: 'Not found' });
+    res.status(204).send();
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-// Set up Plugins and providers
-// !code: config_start // !end
-app.configure(express.rest(
-  // !code: express_rest // !end
-))
-app.configure(socketio(
-  // !code: express_socketio // !end
-))
-// Configure database adapters
-app.configure(mongoose)
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
-// Configure other middleware (see `middleware/index.js`)
-app.configure(middleware)
-// Set up our services (see `services/index.js`)
-app.configure(services)
-// Set up event channels (see channels.js)
-app.configure(channels)
-// !code: config_middle // !end
-
-// Configure a middleware for 404s and the error handler
-app.use(express.notFound())
-app.use(express.errorHandler({ logger }))
-// !code: config_end // !end
-
-app.hooks(appHooks)
-
-const moduleExports = app
-// !code: exports // !end
-module.exports = moduleExports
-
-// !code: funcs // !end
-// !code: end // !end
+module.exports = app;
