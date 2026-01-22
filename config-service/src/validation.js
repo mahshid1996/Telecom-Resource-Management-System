@@ -1,5 +1,5 @@
 const Joi = require('joi');
-
+// Description Schema for individual characteristic values
 const configCharacteristicValueSchema = Joi.object().unknown(true);
 
 const configCharacteristicSchema = Joi.object({
@@ -9,6 +9,7 @@ const configCharacteristicSchema = Joi.object({
   configCharacteristicsValues: Joi.array().items(configCharacteristicValueSchema).required()
 });
 
+// Schema for master configuration and related entities
 const masterConfigSchema = Joi.object({
   name: Joi.string().required(),
   description: Joi.string().required(),

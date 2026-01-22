@@ -1,20 +1,21 @@
+//Imports Mongoose library for MongoDB object modeling
 const mongoose = require('mongoose');
 
+//Defines a schema for related parties
 const relatedPartySchema = new mongoose.Schema({
   role: { type: String, default: '' },
   name: { type: String, required: true },
   email: { type: String, default: '' },
   phone: { type: String, default: '' }
-}, { _id: false });
+}, { _id: false }); //means Mongoose won’t automatically create an _id field for this subdocument
 
-// این قسمت برای مقادیر داخل configCharacteristics
+//This section is for the values inside configCharacteristics
 const configCharacteristicValueSchema = new mongoose.Schema({
   valueType: { type: String, required: true },
-  // هر چی داخل value باشه (array, object, string) میاد
   value: { type: mongoose.Schema.Types.Mixed, required: true }
 }, { _id: false });
 
-// خود configCharacteristic
+
 const configCharacteristicSchema = new mongoose.Schema({
   name: { type: String, required: true },
   code: { type: String, required: true },
@@ -22,13 +23,14 @@ const configCharacteristicSchema = new mongoose.Schema({
   configCharacteristicsValues: [configCharacteristicValueSchema]
 }, { _id: false });
 
-// attachment placeholder
+//Attachment placeholder
 const attachmentSchema = new mongoose.Schema({}, { _id: false, strict: false });
 
+//Main schema masterConfigSchema for storing master configuration documents
 const masterConfigSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
-  type: { type: String, required: true }, // الان کاملاً آزاد
+  type: { type: String, required: true }, 
   baseType: { type: String, required: true }, 
   status: { type: String, enum: ['Active', 'InActive'], required: true },
   code: { type: String, required: true },

@@ -1,6 +1,6 @@
 const express = require('express');
 const { swaggerUi, specs } = require('./swagger');
-const MasterConfig = require('./models/masterConfigRoutes'); // اصلاح مدل
+const MasterConfig = require('./models/masterConfigRoutes'); 
 const { masterConfigSchema } = require('./validation.js');
 const cors = require("cors");
 
@@ -162,7 +162,7 @@ app.patch('/master-config/:id', async (req, res) => {
   }
 });
 
-// 📘 Swagger docs
+// Swagger docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 module.exports = app;

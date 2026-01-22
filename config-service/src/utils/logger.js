@@ -1,9 +1,9 @@
 const { format, createLogger, transports } = require('winston');
 const path = require('path');
 
-// ایجاد logger
+// Create logger
 const logger = createLogger({
-  level: 'info', // سطح لاگ
+  level: 'info', // Level of log
   format: format.combine(
     format.colorize(),
     format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
@@ -22,5 +22,5 @@ const logger = createLogger({
   ],
 });
 
-// خروجی logger
+// Output of logger
 module.exports = logger;

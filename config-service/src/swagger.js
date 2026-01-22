@@ -1,7 +1,7 @@
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
-// تنظیمات Swagger
+// Swagger Settings
 const options = {
   definition: {
     openapi: '3.0.0',
@@ -11,9 +11,9 @@ const options = {
       description: 'API for managing master config resources with various filters and CRUD operations.',
     },
   },
-  apis: ['./src/routes/masterConfigRoutes.js', './src/app.js'], // فایل‌های مرتبط با API
+  apis: ['./src/routes/masterConfigRoutes.js', './src/app.js'], // API Related Files
 };
 
-const specs = swaggerJsdoc(options); // ساخت مستندات Swagger
+const specs = swaggerJsdoc(options); // Build Swagger Documentation
 
 module.exports = { swaggerUi, specs };
