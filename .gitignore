@@ -1,8 +1,53 @@
+# Node / frontend
 **/node_modules/
 **/.env
 npm-debug.log*
 yarn-error.log*
+
+# Go build artifacts
+bin/
+build/
 dist/
-coverage/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Go test + cache
+*.test
+*.out
+
+# Vendor (if using go mod vendor)
+vendor/
+
+# Go workspace files (Go >= 1.18)
+go.work
+go.work.sum
+
+# Logs
 logs/
+*.log
+*.pid
+
+# Local dev uploads + temp
+uploads/
+reports/
+tmp/
+*.tmp
+
+# Coverage + profiling
+coverage/
+*.prof
+
+# IDE / editor files
+.vscode/
+.idea/
+*.iml
+
+# OS-specific
 .DS_Store
+
+# Local config overrides
+config.local.*
+*.local.*
+*.dev.*
