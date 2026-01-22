@@ -1,0 +1,209 @@
+syntax = "proto3";
+
+package physicalresource;
+
+option go_package = "drm-bulk-service/internal/proto/physicalresource;physicalresource";
+
+
+service PhysicalResourceService {
+  rpc CreatePhysicalResource (PhysicalResource) returns (PhysicalResourceResponse);
+  rpc PatchPhysicalResource (PatchPhysicalRequest) returns (PhysicalResourceResponse);
+}
+
+message PhysicalResource {
+    string id = 1;
+    string description = 2;
+    string name = 3;
+    string type = 4;
+    string baseType = 5;
+    bool isBundle = 6;
+    string value = 7;
+    string startOperatingDate = 8;
+    string endOperatingDate = 9;
+    string resourceRecycleDate = 10;
+
+    enum ResourceStatus {
+        Created = 0;
+        Available = 1;
+        Reserved = 2;
+        InUse = 3;
+        Retired = 4;
+        Disabled = 5;
+    }
+    string resourceStatus = 11;
+
+    repeated string businessType = 12;
+    repeated string category = 13;
+
+    message Cost {
+        int64 taxFreeValue = 1;
+        int64 taxedValue = 2;
+        string unit = 3;
+    }
+    Cost cost = 14;
+
+    message Note {
+        string authorRole = 1;
+        string author = 2;
+        string date = 3; // ISO date string
+        string text = 4;
+    }
+    repeated Note note = 15;
+
+    message RelatedParty {
+        string name = 1;
+        string role = 2;
+        string type = 3;
+        string baseType = 4;
+    }
+    repeated RelatedParty relatedParty = 16;
+
+    message ResourceCharacteristic {
+        string code = 1;
+        string name = 2;
+        bool publicIdentifier = 3;
+        string value = 4;
+        string valueType = 5;
+    }
+    repeated ResourceCharacteristic resourceCharacteristic = 17;
+
+    // ResourceRelationship of the LogicalResourceMessage task 
+    message ResourceRelationship{
+        enum RelationshipType {
+            reliesOn = 0;
+            bundle = 1;
+            dependency = 2;
+            starterPack =3;
+            capacity=4;
+            pool=5;
+        }
+        string relationshipType = 1;
+        message ValidFor{
+            string startDateTime = 1;
+            string endDateTime = 2;
+          }
+          ValidFor validFor = 2 [json_name = "validFor"];
+          message Resource{
+            string id = 1;
+           string type = 2 ;
+           string baseType = 3;
+          }
+          Resource resource = 3 [json_name = "resource"];
+    }
+    repeated ResourceRelationship resourceRelationship = 18 ;
+
+    message BundledResources {
+        string id = 1;
+        string href = 2;
+        string type = 3;
+        string baseType = 4;
+        string schemaLocation = 5;
+    }
+    repeated BundledResources bundledResources = 19;
+
+    string createdAt = 20;
+    string updatedAt = 21;
+}
+
+message PhysicalResourceResponse{
+    string id = 1;
+    string description = 2;
+    string name = 3;
+    string type = 4;
+    string baseType = 5;
+    bool isBundle = 6;
+    string value = 7;
+    string startOperatingDate = 8;
+    string endOperatingDate = 9;
+    string resourceRecycleDate = 10;
+
+    enum ResourceStatus {
+        Created = 0;
+        Available = 1;
+        Reserved = 2;
+        InUse = 3;
+        Retired = 4;
+        Disabled = 5;
+    }
+    string resourceStatus = 11;
+
+    repeated string businessType = 12;
+    repeated string category = 13;
+
+    message Cost {
+        int64 taxFreeValue = 1;
+        int64 taxedValue = 2;
+        string unit = 3;
+    }
+    Cost cost = 14;
+
+    message Note {
+        string authorRole = 1;
+        string author = 2;
+        string date = 3; // ISO date string
+        string text = 4;
+    }
+    repeated Note note = 15;
+
+    message RelatedParty {
+        string name = 1;
+        string role = 2;
+        string type = 3;
+        string baseType = 4;
+    }
+    repeated RelatedParty relatedParty = 16;
+
+    message ResourceCharacteristic {
+        string code = 1;
+        string name = 2;
+        bool publicIdentifier = 3;
+        string value = 4;
+        string valueType = 5;
+    }
+    repeated ResourceCharacteristic resourceCharacteristic = 17;
+
+    // ResourceRelationship of the LogicalResourceMessage task 
+    message ResourceRelationship{
+        enum RelationshipType {
+            reliesOn = 0;
+            bundle = 1;
+            dependency = 2;
+            starterPack =3;
+            capacity=4;
+            pool=5;
+        }
+        string relationshipType = 1;
+        message ValidFor{
+            string startDateTime = 1;
+            string endDateTime = 2;
+          }
+          ValidFor validFor = 2 [json_name = "validFor"];
+          message Resource{
+            string id = 1;
+           string type = 2 ;
+           string baseType = 3;
+          }
+          Resource resource = 3 [json_name = "resource"];
+    }
+    repeated ResourceRelationship resourceRelationship = 18 ;
+
+    message BundledResources {
+        string id = 1;
+        string href = 2;
+        string type = 3;
+        string baseType = 4;
+        string schemaLocation = 5;
+    }
+    repeated BundledResources bundledResources = 19;
+
+    string createdAt = 20;
+    string updatedAt = 21;
+}
+
+message PatchPhysicalRequest{
+    string id = 1;
+    PhysicalResource physicalResource = 2;
+}
+
+
+
