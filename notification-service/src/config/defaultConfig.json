@@ -1,0 +1,13 @@
+{
+  "port": 3000,
+  "mongo": {
+    "uri": "mongodb://localhost:27017/notif-service"
+  },
+  "email": {
+    "host": "smtp.ethereal.email",
+    "port": 587,
+    "user": "maximo31@ethereal.email",
+    "pass": "CVts4HHnCBjAAz37bh"
+  },
+  "emailChunkSize": 50
+}

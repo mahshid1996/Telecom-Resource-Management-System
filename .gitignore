@@ -1,6 +1,7 @@
-# Node / frontend
+# NodeJS (any nested project)
 **/node_modules/
 **/.env
+**/.env.*
 npm-debug.log*
 yarn-error.log*
 
@@ -17,29 +18,29 @@ dist/
 *.test
 *.out
 
-# Vendor (if using go mod vendor)
+# Vendor (Go)
 vendor/
 
-# Go workspace files (Go >= 1.18)
+# Go workspace
 go.work
 go.work.sum
 
-# Logs
-logs/
+# Logs (any nested service)
+**/logs/
 *.log
 *.pid
 
-# Local dev uploads + temp
-uploads/
-reports/
-tmp/
+# Local uploads + reports + temp (any nested)
+**/uploads/
+**/reports/
+**/tmp/
 *.tmp
 
 # Coverage + profiling
-coverage/
+**/coverage/
 *.prof
 
-# IDE / editor files
+# IDE / Editors
 .vscode/
 .idea/
 *.iml
