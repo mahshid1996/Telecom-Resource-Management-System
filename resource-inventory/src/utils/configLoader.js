@@ -5,7 +5,7 @@ async function loadMasterConfig(app) {
   try {
     const response = await axios.get('http://localhost:3030/master-config?type=Policy');
     console.log(JSON.stringify(response.data))
-    applog('info', new Date().toISOString(), 'Response data:'+ response.data);
+    applog('info', new Date().toISOString(), 'Response data:'+ JSON.stringify(response.data));
 
     const configs = response.data;
 
