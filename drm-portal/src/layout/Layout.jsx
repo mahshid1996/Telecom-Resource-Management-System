@@ -7,11 +7,11 @@ export default function Layout() {
   const loc = useLocation();
   const token = getToken();
 
-React.useEffect(() => {
-  if (!token && loc.pathname !== "/login") {
-    nav("/login", { replace: true });
-  }
-}, [token, nav, loc.pathname]);
+  React.useEffect(() => {
+    if (!token && loc.pathname !== "/login") {
+      nav("/login", { replace: true });
+    }
+  }, [token, nav, loc.pathname]);
 
   const active = (path) => loc.pathname === path || loc.pathname.startsWith(path + "/");
 
@@ -41,28 +41,24 @@ React.useEffect(() => {
           >
             Categories
           </div>
-                    <div
+
+          <div
             className={`navItem ${active("/bulk") ? "active" : ""}`}
             onClick={() => nav("/bulk")}
           >
             Bulk Operations
           </div>
 
-          {/* later you can add: Bulk Ops, Categories, Notifications, Live Chat */}
+          {/* Live Chat tab */}
+          <div
+            className={`navItem ${active("/chat") ? "active" : ""}`}
+            onClick={() => nav("/chat")}
+          >
+            Live Chat
+          </div>
         </div>
 
-        <div className="footerBtn">
-          <button
-            className="btn btn-primary"
-            onClick={() => {
-              clearToken();
-              nav("/login");
-            }}
-            type="button"
-          >
-            Logout
-          </button>
-        </div>
+        {/* logout button etc... */}
       </aside>
 
       <main className="main">

@@ -19,6 +19,14 @@ const createTransporter = () => {
 async function sendEmail(to, body, subject = 'Notification') {
   try {
     const transporter = createTransporter();
+        console.log(JSON.stringify( transporter.options )); // debug log
+    const test ={
+      from: `"Notif Service" <${process.env.GMAIL_SENDER}>`,
+      to,
+      subject,
+      text: body,
+    }
+        console.log(JSON.stringify( test )); // debug log
     const info = await transporter.sendMail({
       from: `"Notif Service" <${process.env.GMAIL_SENDER}>`,
       to,
