@@ -1,13 +1,19 @@
-const { format, createLogger, transports } = require('winston');
+const { createLogger, format, transports } = require('winston');
 const path = require('path');
 
-// Create logger
+/**
+ * Centralized application logger.
+ * Logs are written to console and to dedicated log files.
+ * - app.log  -> all application logs
+ * - error.log -> error-level logs only
+ */
+
 const logger = createLogger({
-  level: 'info', // Level of log
+  level: 'info',
   format: format.combine(
-    format.colorize(),
     format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    format.printf(({ timestamp, level, message }) => `[${timestamp}] [${level}] ${message}`)
+    format.errors({ stack: true }),
+    format.json()
   ),
   transports: [
     new transports.Console(),
@@ -22,5 +28,4 @@ const logger = createLogger({
   ],
 });
 
-// Output of logger
 module.exports = logger;
