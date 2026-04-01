@@ -6,7 +6,7 @@ const logger = require('../utils/logger');
 
 // updated schema
 const notificationSchema = Joi.object({
-  emailLists: Joi.array().items(Joi.string().email()).required(),
+  configCode: Joi.string().required(),
   body: Joi.string().required(),
   subject: Joi.string().optional()
 });
@@ -19,16 +19,38 @@ async function createNotification(req, res) {
       return res.status(400).json({ error: error.details[0].message });
     }
 
-    const notification = new Notification(value);
+const configs = req.app.get('notificationConfigs') || [];
+
+const selectedConfig = configs.find(c => c.code === value.configCode);
+
+if (!selectedConfig) {
+  return res.status(400).json({ error: 'Invalid configCode' });
+}
+
+const emailList = selectedConfig.configCharacteristics
+  .find(c => c.code === 'emailRecipients')
+  ?.configCharacteristicsValues[0]?.value || [];
+
+const chunkSize = selectedConfig.configCharacteristics
+  .find(c => c.code === 'chunkSize')
+  ?.configCharacteristicsValues[0]?.value || 50;
+
+const notification = new Notification({
+  configCode: value.configCode,
+  emailLists: emailList,
+  body: value.body,
+  subject: value.subject
+});notificationQueue
     await notification.save();
     logger.info(`Notification saved with ID: ${notification._id}`);
 
-    await notificationQueue.add({
-      emailLists: value.emailLists,
-      body: value.body,
-      subject: value.subject,
-      notificationId: notification._id
-    });
+   await notificationQueue.add({
+  emailLists: emailList,
+  body: value.body,
+  subject: value.subject,
+  notificationId: notification._id,
+  chunkSize
+});
 
     logger.info(`Notification queued for emails: ${value.emailLists.join(', ')}`);
 
