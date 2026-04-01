@@ -11,7 +11,7 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
-// Test Unit برای MasterConfig API
+
 describe('MasterConfig API', () => {
 
   // Test GET /master-config
@@ -23,18 +23,16 @@ describe('MasterConfig API', () => {
 
   // Test POST /master-config
   test('POST /master-config should create a new config', async () => {
-    const newConfig = {
-      name: 'New Config',
-      description: 'A new configuration',
-      status: 'Active',
-      code: '12345',
-      type: 'NotificationConfig',
-      baseType: 'BaseType',
-      configCharacteristics: [],
-      relatedParty: [],
-      attachment: [],
-      version: 1,
-    };
+   const newConfig = {
+  name: 'New Config',
+  description: 'A new configuration',
+  status: 'Active',
+  type: 'NotificationConfig',
+  baseType: 'BaseType',
+  configCharacteristics: [],
+  relatedParty: [],
+  attachment: []
+};
 
     const res = await request(app).post('/master-config').send(newConfig);
     expect(res.statusCode).toBe(201);
