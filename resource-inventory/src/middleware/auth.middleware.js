@@ -1,5 +1,5 @@
 /**
- * 🛡️ Middleware to authenticate requests using JWT.
+ * ️ Middleware to authenticate requests using JWT.
  * - Verifies the provided token in the Authorization header.
  * - Logs each authentication step using applog.
  */
@@ -18,7 +18,7 @@ function authenticateToken(req, res, next) {
     return res.status(401).json({ error: 'Unauthorized: No token provided' });
   }
 
-  const token = authHeader.split(' ')[1]; //Format: Bearer <accessToken>
+  const token = authHeader.split(' ')[1]; 
   if (!token) {
     applog('warn', getTime(), `Invalid token format (Path: ${req.originalUrl})`);
     return res.status(401).json({ error: 'Unauthorized: Invalid token format' });
