@@ -1,3 +1,4 @@
+
 const mongoose = require('mongoose');
 const noteSchema = new mongoose.Schema({
   authorRole: String,
@@ -72,14 +73,14 @@ const physicalResourceSchema = new mongoose.Schema({
 
   resourceStatus: {
     type: String,
-    enum: ['Created', 'Available', 'Reserved', 'InUse', 'Retired', 'Disabled', 'Pooled', 'Blocked'],
+    enum: ['Created', 'Available', 'Reserved', 'Operating', 'Retired', 'Disabled', 'Blocked'],
   },
 
   businessType: [String],
   category: [String],
   cost: costSchema,
   note: [noteSchema],
-  place: [String], // e.g., "Warehouse A" or "Data Center 3"
+  place: [String], 
   relatedParty: [relatedPartySchema],
   resourceCharacteristic: [resourceCharacteristicSchema],
   resourceSpecification: [String],
