@@ -12,6 +12,7 @@ import BulkCreatePage from "./pages/BulkCreatePage.jsx";
 import BulkUpdatePage from "./pages/BulkUpdatePage.jsx";
 import BulkReportPage from "./pages/BulkReportPage.jsx";
 import BulkRequestDetailsPage from "./pages/BulkRequestDetailsPage.jsx";
+import NotificationsPage from "./pages/NotificationsPage.jsx";
 
 import LiveChatPage from "./pages/LiveChatPage.jsx";
 
@@ -36,6 +37,8 @@ export default function App() {
 
         {/* Live Chat route */}
         <Route path="chat" element={<LiveChatPage />} />
+
+        <Route path="notifications" element={<NotificationsPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
