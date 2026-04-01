@@ -27,23 +27,27 @@ const configCharacteristicSchema = new mongoose.Schema({
 const attachmentSchema = new mongoose.Schema({}, { _id: false, strict: false });
 
 //Main schema masterConfigSchema for storing master configuration documents
-const masterConfigSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  description: { type: String, required: true },
-  type: { type: String, required: true }, 
-  baseType: { type: String, required: true }, 
-  status: { type: String, enum: ['Active', 'InActive'], required: true },
-  code: { type: String, required: true },
-  configCharacteristics: [configCharacteristicSchema],
-  relatedParty: [relatedPartySchema],
-  attachment: [attachmentSchema],
-  version: { type: Number, default: 0 },
-  createdAt: Date,
-  updatedAt: Date,
-  batchStart: String,
-  currentBatch: String,
-  href: String
-}, { timestamps: true });
+const masterConfigSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    description: { type: String, required: true },
+    type: { type: String, required: true },
+    baseType: { type: String, required: true },
+    status: { type: String, enum: ['Active', 'InActive'], required: true },
+    code: { type: String, required: true },
+    configCharacteristics: [configCharacteristicSchema],
+    relatedParty: [relatedPartySchema],
+    attachment: [attachmentSchema],
+    version: { type: Number, default: 0 },
+    batchStart: String,
+    currentBatch: String,
+    href: String
+  },
+  {
+    timestamps: true,
+    versionKey: false  
+  }
+);
 
 const MasterConfig = mongoose.model('MasterConfig', masterConfigSchema, 'masterconfig');
 
