@@ -1,0 +1,117 @@
+services:
+
+  mongo:
+    image: mongo:7
+    container_name: telecom-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  config-service:
+    build:
+      context: ./config-service
+      dockerfile: docker/Dockerfile
+    container_name: config-service
+    restart: always
+    ports:
+      - "3030:3030"
+    depends_on:
+      - mongo
+    environment:
+      - NODE_ENV=development
+      - MONGO_URL=mongodb://host.docker.internal:27017/resourceDB
+  resource-inventory:
+    build:
+      context: ./resource-inventory
+      dockerfile: docker/Dockerfile
+    container_name: resource-inventory
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+      - config-service
+    environment:
+      - NODE_ENV= development
+      - PORT= 3000
+      - MONGO_URI=mongodb://host.docker.internal:27017/resourceDB
+      - CONFIG_SERVICE_URL= http://config-service:3030
+      - KAFKA_HOST=kafka:9092
+      - JWT_SECRET= mysecretkey
+  engine:
+    build:
+      context: ./engine
+      dockerfile: Docker/Dockerfile
+    container_name: engine
+    restart: always
+    depends_on:
+      - kafka
+      - resource-inventory
+    environment:
+      - SERVICE_NAME=engine-service
+      - KAFKA_BROKERS=kafka:9092
+      - KAFKA_GROUP_ID=engine-consumer-group
+      - KAFKA_TOPICS=logicalResourcePatchEvent,physicalResourcePatchEvent
+      - INVENTORY_BASE_URL=http://resource-inventory:3000
+      - RECYCLING_INTERVAL=60000
+      - RECYCLING_BATCH_LIMIT=50
+
+  drm-bulk-service:
+    build:
+      context: ./drm-bulk-service
+      dockerfile: docker/Dockerfile
+    container_name: drm-bulk-service
+    restart: always
+    ports:
+      - "3035:3035"
+    depends_on:
+      - mongo
+      - resource-inventory
+    environment:
+      - PORT=3035
+      - MONGO_URI=mongodb://host.docker.internal:27017/resourceDB
+      - MONGO_DB=resourceDB
+      - INVENTORY_GRPC_ADDRESS=resource-inventory:50051
+  kafka:
+    image: docker.redpanda.com/redpandadata/redpanda:v23.3.11
+    container_name: kafka
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp
+      - "1"
+      - --memory
+      - "256M"
+      - --reserve-memory
+      - "0M"
+      - --node-id
+      - "0"
+      - --check=false
+      - --kafka-addr
+      - PLAINTEXT://0.0.0.0:9092
+      - --advertise-kafka-addr
+      - PLAINTEXT://kafka:9092
+    ports:
+      - "9092:9092"
+    restart: always
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: docker/Dockerfile
+    container_name: notification-service
+    restart: always
+    ports:
+      - "3039:3039"
+    depends_on:
+      - mongo
+    environment:
+      - PORT=3039
+      - MONGO_URI=mongodb://host.docker.internal:27017/resourceDB
+      - REDIS_HOST=host.docker.internal
+      - REDIS_PORT=6379
+
+volumes:
+  mongo_data:
