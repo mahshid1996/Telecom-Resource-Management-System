@@ -16,7 +16,7 @@ const physicalProto = grpc.loadPackageDefinition(
 
 const server = new grpc.Server();
 
-// Register your handlers (implementations)
+// Register your handlers 
 server.addService(logicalProto.LogicalResourceService.service, require('./services/logicalService.js'));
 server.addService(physicalProto.PhysicalResourceService.service, require('./services/physicalService.js'));
 
