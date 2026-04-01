@@ -382,6 +382,7 @@ exports.createLogicalResource = async (req, res) => {
         ? req.body.resourceRelationship
         : [],
       bundledResources: Array.isArray(req.body.bundledResources) ? req.body.bundledResources : [],
+         resourceStatus: req.body.resourceStatus || 'Created'
     });
 
     // Save the resource in MongoDB
@@ -408,7 +409,7 @@ exports.createLogicalResource = async (req, res) => {
           applog('error', new Date().toISOString(), 'Kafka publish failed: ' + err.message);
         } else {
           applog('info', new Date().toISOString(), 'Kafka event published successfully');
-          applog('info', new Date().toISOString(), 'Kafka publish result:' + data);
+          applog('info', new Date().toISOString(), 'Kafka publish result:' + JSON.stringify(data));
         }
       }
     );
@@ -427,16 +428,16 @@ exports.getLogicalResources = async (req, res) => {
     const { buildQuery } = require('../utils/queryBuilder');
     const { filter, queryOptions } = buildQuery(req.query);
 
-    // Fetch paginated resources (same behavior as before)
+    // Fetch paginated resources 
     const resources = await LogicalResource.find(filter)
       .skip(queryOptions.skip)
       .limit(queryOptions.limit)
       .sort(queryOptions.sort);
 
-    // NEW: count total number of resources matching the filter (ignoring limit/offset)
+    // NEW: count total number of resources matching the filter 
     const totalCount = await LogicalResource.countDocuments(filter);
 
-    // Expose total count in response headers (visible in Postman, etc.)
+    // Expose total count in response headers 
     res.set('X-Total-Count', totalCount.toString());
     // For browsers/clients with CORS, explicitly expose the header
     res.set('Access-Control-Expose-Headers', 'X-Total-Count');
@@ -467,11 +468,16 @@ exports.getLogicalResourceById = async (req, res) => {
   }
 };
 
-// Update an existing Logical Resource
+// Update an existing Logical Resource 
 exports.updateLogicalResource = async (req, res) => {
   try {
-    const updated = await LogicalResource.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updated) return res.status(404).json({ error: 'Resource not found' });
+    const updated = await LogicalResource.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    if (!updated)
+      return res.status(404).json({ error: 'Resource not found' });
 
     auditLog('UPDATE', 'LogicalResource', updated._id, req.user?.username || 'unknown');
 
@@ -481,10 +487,15 @@ exports.updateLogicalResource = async (req, res) => {
       timestamp: new Date().toISOString(),
     });
 
-    kafkaProducer.send([{ topic: 'logical-resource-events', messages: eventPayload }], err => {
-      if (err) applog('error', new Date().toISOString(), 'Kafka publish failed: ' + err.message);
-      else applog('info', new Date().toISOString(), 'Kafka event published: LogicalResourceUpdated');
-    });
+    kafkaProducer.send(
+      [{ topic: 'logical-resource-events', messages: eventPayload }],
+      err => {
+        if (err)
+          applog('error', new Date().toISOString(), 'Kafka publish failed: ' + err.message);
+        else
+          applog('info', new Date().toISOString(), 'Kafka event published: LogicalResourceUpdated');
+      }
+    );
 
     applog('info', new Date().toISOString(), `Resource updated: ${updated._id}`);
     res.json(updated);
@@ -493,6 +504,79 @@ exports.updateLogicalResource = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// Partially update an existing Logical Resource (PATCH)
+exports.patchLogicalResource = async (req, res) => {
+  const resourceId = req.params.id;
+  const username = req.user?.username || 'unknown';
+
+  try {
+    //Fetch original to compare and use later in Kafka event
+    const before = await LogicalResource.findById(resourceId);
+    if (!before) {
+      applog('warn', new Date().toISOString(), `PATCH failed: Resource not found ${resourceId}`);
+      return res.status(404).json({ error: 'Resource not found' });
+    }
+
+    //Apply patch only to provided fields
+    const patched = await LogicalResource.findByIdAndUpdate(
+      resourceId,
+      { $set: req.body },
+      { new: true, runValidators: true }
+    );
+
+    // Safety validation 
+    if (!patched) {
+      applog('error', new Date().toISOString(), `PATCH update failed for ${resourceId}`);
+      return res.status(500).json({ error: 'Failed to apply patch' });
+    }
+
+    //Perform auditing 
+    auditLog(
+      'UPDATE',
+      'LogicalResource',
+      patched._id,
+      username
+    );
+
+    // Build Kafka event payload
+    const eventPayload = {
+      event: 'LogicalResourcePatched',
+      id: patched._id.toString(),
+      actor: username,
+      timestamp: new Date().toISOString(),
+      before: before,   // full before snapshot
+      after: patched    // full after snapshot
+    };
+
+    applog('info', new Date().toISOString(), 'Sending Kafka PATCH event: ' + JSON.stringify(eventPayload));
+
+    // Send event to Kafka
+    kafkaProducer.send(
+      [{
+        topic: 'logicalResourcePatchEvent',
+        messages: JSON.stringify(eventPayload)
+      }],
+      (err, data) => {
+        if (err) {
+          applog('error', new Date().toISOString(), 'Kafka PATCH publish failed: ' + err.message);
+        } else {
+          applog('info', new Date().toISOString(), 'Kafka PATCH event published successfully');
+          applog('info', new Date().toISOString(), 'Kafka PATCH publish result: ' + JSON.stringify(data));
+        }
+      }
+    );
+
+    applog('info', new Date().toISOString(), `Resource patched: ${patched._id}`);
+    return res.json(patched);
+
+  } catch (err) {
+    applog('error', new Date().toISOString(), 'Patch logical resource failed: ' + err.message);
+    return res.status(500).json({ error: err.message });
+  }
+};
+
+
 
 // Delete a Logical Resource
 exports.deleteLogicalResource = async (req, res) => {
@@ -508,10 +592,15 @@ exports.deleteLogicalResource = async (req, res) => {
       timestamp: new Date().toISOString(),
     });
 
-    kafkaProducer.send([{ topic: 'logical-resource-events', messages: eventPayload }], err => {
-      if (err) applog('error', new Date().toISOString(), 'Kafka publish failed: ' + err.message);
-      else applog('info', new Date().toISOString(), 'Kafka event published: LogicalResourceDeleted');
-    });
+    kafkaProducer.send(
+      [{ topic: 'logical-resource-events', messages: eventPayload }],
+      err => {
+        if (err)
+          applog('error', new Date().toISOString(), 'Kafka publish failed: ' + err.message);
+        else
+          applog('info', new Date().toISOString(), 'Kafka event published: LogicalResourceDeleted');
+      }
+    );
 
     applog('info', new Date().toISOString(), `Resource deleted: ${deleted._id}`);
     res.json({ message: 'Resource deleted successfully' });
