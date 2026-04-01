@@ -7,7 +7,7 @@ const authenticateToken = require('../middleware/auth.middleware');
 router.post('/', authenticateToken, controller.createLogicalResource);
 router.get('/', authenticateToken, controller.getLogicalResources);
 router.get('/:id', authenticateToken, controller.getLogicalResourceById);
-router.patch('/:id', authenticateToken, controller.updateLogicalResource);
+router.patch('/:id', authenticateToken, controller.patchLogicalResource);
 router.delete('/:id', authenticateToken, controller.deleteLogicalResource);
 
 module.exports = router;
