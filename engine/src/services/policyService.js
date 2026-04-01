@@ -1,48 +1,25 @@
-const logger = require('../logger');
-const { evaluatePolicy } = require('./policyService');
-const { addDurationToDate } = require('../utils/dateUtils');
-const {
-  getRetiredLogical,
-  getRetiredPhysical,
-  patchLogicalResource,
-  patchPhysicalResource
-} = require('./inventoryApi');
+const policies = [
+  {
+    categoryCode: "RC34",
+    resourceStatus: "Retired",
+    operationalState: "Terminated",
+    duration: 180,
+    unit: "Minute",
+    nextResourceStatus: "Available",
+    nextOperationalState: "Functional"
+  }
+];
 
-async function runRecycling() {
-  const now = new Date();
+function evaluatePolicy(resource) {
+  const categoryCode = Array.isArray(resource.category)
+    ? resource.category[0]
+    : resource.category;
 
-  const logical = await getRetiredLogical();
-  const physical = await getRetiredPhysical();
-
-  const process = async (resource, isLogical) => {
-    if (!resource.resourceRecycleDate) return;
-
-    const recycleDate = new Date(resource.resourceRecycleDate);
-    if (recycleDate > now) return;
-
-    const policy = evaluatePolicy(resource);
-    if (!policy) return;
-
-    const payload = {
-      resourceStatus: policy.nextResourceStatus,
-      operationalState: policy.nextOperationalState,
-      resourceRecycleDate: null
-    };
-
-    if (isLogical)
-      await patchLogicalResource(resource.id, payload);
-    else
-      await patchPhysicalResource(resource.id, payload);
-  };
-
-  for (const r of logical) await process(r, true);
-  for (const r of physical) await process(r, false);
-
-  logger.info('Recycling cycle completed');
+  return policies.find(p =>
+    p.categoryCode === categoryCode &&
+    p.resourceStatus === resource.resourceStatus &&
+    p.operationalState === resource.operationalState
+  );
 }
 
-function startRecyclingJob(interval) {
-  setInterval(runRecycling, interval);
-}
-
-module.exports = { startRecyclingJob };
+module.exports = { evaluatePolicy };
