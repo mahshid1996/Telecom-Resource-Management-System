@@ -1,20 +1,20 @@
 import { api, getToken } from "./client";
 
-/
+/**
  * Create Logical Resource
  */
 export function createLogicalResource(payload) {
   return api("/api/logical-resources", { method: "POST", body: payload });
 }
 
-/
+/**
  * Create Physical Resource
  */
 export function createPhysicalResource(payload) {
   return api("/api/physical-resources", { method: "POST", body: payload });
 }
 
-/
+/**
  * LIST endpoints (used in normal UI pages)
  * These remain unchanged and safe.
  */
@@ -26,20 +26,20 @@ export async function listPhysicalResources() {
   return await api("/api/physical-resources", { method: "GET" });
 }
 
-/
+/**
  * SEARCH endpoints
  */
 export function searchLogicalResources(params) {
   const q = new URLSearchParams(params).toString();
-  return api(/api/logical-resources/search?${q}, { method: "GET" });
+  return api(`/api/logical-resources/search?${q}`, { method: "GET" });
 }
 
 export function searchPhysicalResources(params) {
   const q = new URLSearchParams(params).toString();
-  return api(/api/physical-resources/search?${q}, { method: "GET" });
+  return api(`/api/physical-resources/search?${q}`, { method: "GET" });
 }
 
-/
+/**
  * INTERNAL helper to fetch only X-Total-Count header.
  * Uses Authorization header because Inventory APIs are protected.
  * Uses limit=1 to avoid heavy payload transfer.
@@ -62,7 +62,7 @@ async function fetchTotalCount(path) {
   return Number(total || 0);
 }
 
-/
+/**
  * KPI Dashboard metrics
  * Uses existing Inventory filtering APIs.
  * Does NOT introduce new backend endpoints.
@@ -82,17 +82,17 @@ export async function getResourceKpis() {
     retiredLogical,
     retiredPhysical,
   ] = await Promise.all([
-    fetchTotalCount(${logical}?limit=1),
-    fetchTotalCount(${physical}?limit=1),
+    fetchTotalCount(`${logical}?limit=1`),
+    fetchTotalCount(`${physical}?limit=1`),
 
-    fetchTotalCount(${logical}?resourceStatus=Available&limit=1),
-    fetchTotalCount(${physical}?resourceStatus=Available&limit=1),
+    fetchTotalCount(`${logical}?resourceStatus=Available&limit=1`),
+    fetchTotalCount(`${physical}?resourceStatus=Available&limit=1`),
 
-    fetchTotalCount(${logical}?resourceStatus=Reserved&limit=1),
-    fetchTotalCount(${physical}?resourceStatus=Reserved&limit=1),
+    fetchTotalCount(`${logical}?resourceStatus=Reserved&limit=1`),
+    fetchTotalCount(`${physical}?resourceStatus=Reserved&limit=1`),
 
-    fetchTotalCount(${logical}?resourceStatus=Retired&limit=1),
-    fetchTotalCount(${physical}?resourceStatus=Retired&limit=1),
+    fetchTotalCount(`${logical}?resourceStatus=Retired&limit=1`),
+    fetchTotalCount(`${physical}?resourceStatus=Retired&limit=1`),
   ]);
 
   return {
