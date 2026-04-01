@@ -1,5 +1,4 @@
- 
-const express = require('express');
+ const express = require('express');
 const cors = require('cors');
 const masterConfigRoutes = require('./routes/masterConfigRoutes');
 const errorHandler = require('./middleware/errorHandler');
