@@ -23,13 +23,15 @@ const { loadMasterConfig } = require('./utils/configLoader.js');
 
 const app = express();
 
-(async () => {
-  try {
-    await loadMasterConfig(app);
-  } catch (err) {
-    console.error('Failed to start server due to config error');
-  }
-})();
+if (process.env.NODE_ENV !== 'test') {
+  (async () => {
+    try {
+      await loadMasterConfig(app);
+    } catch (err) {
+      console.error('Failed to start server due to config error');
+    }
+  })();
+}
 
 //General Middleware and Swagger UI
 app.use(cors()); 
@@ -40,10 +42,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('dev')); 
 app.use(loggerMiddleware); 
 
-//Public Routes (No JWT required)
+//Public Routes 
 app.use('/api/auth', authRoutes); 
 
-//Protected Routes (JWT required)
+//Protected Routes )
 app.use('/api/logical-resources', authenticateToken, logicalResourceRoutes);
 app.use('/api/physical-resources', authenticateToken, physicalResourceRoutes);
 app.use('/api/resource-categories', authenticateToken, resourceCategoryRoutes);
@@ -56,3 +58,4 @@ app.use('/api/', authenticateToken, healthRoutes);
 app.use(errorMiddleware); 
 
 module.exports = app;
+
