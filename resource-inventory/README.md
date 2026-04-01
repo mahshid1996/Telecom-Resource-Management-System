@@ -72,6 +72,10 @@ http://localhost:3000/api-docs -> swagger
 1. **Clone repo & install dependencies**
 
    ```bash
-   git clone <your-repo-url>
+   git clone <repo-url>
    cd resource-management-system
    npm install
+
+   for test cases we need to have 
+   NODE_ENV=test npm test
+   npm test
