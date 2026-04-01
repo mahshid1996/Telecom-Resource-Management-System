@@ -13,7 +13,7 @@ const buildQuery = (reqQuery) => {
   const limit = parseInt(reqQuery.limit, 10) || 20;
   const offset = parseInt(reqQuery.offset, 10) || 0;
 
-  // Default sort by createdAt DESC (newest first)
+  // Default sort by createdAt DESC 
   let sort = { createdAt: -1 };
 
   // If custom sort provided
