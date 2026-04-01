@@ -1,4 +1,5 @@
-/**
+     
+   /**
  * @file physicalResource.controller.js
  * @description Handles business logic for managing physical resources.
  * 
@@ -425,5 +426,75 @@ exports.deletePhysicalResource = async (req, res) => {
   } catch (err) {
     applog('error', new Date().toISOString(), 'Delete physical resource failed: ' + err.message);
     res.status(500).json({ error: err.message });
+  }
+};
+
+// Partially update a Physical Resource (PATCH)
+exports.patchPhysicalResource = async (req, res) => {
+  const resourceId = req.params.id;
+  const username = req.user?.username || 'unknown';
+
+  try {
+    // Read existing state for before-snapshot
+    const before = await PhysicalResource.findById(resourceId);
+    if (!before) {
+      applog('warn', new Date().toISOString(), `PATCH failed: PhysicalResource not found ${resourceId}`);
+      return res.status(404).json({ error: 'Resource not found' });
+    }
+
+    // Apply partial modifications
+    const patched = await PhysicalResource.findByIdAndUpdate(
+      resourceId,
+      { $set: req.body },
+      { new: true, runValidators: true }
+    );
+
+    if (!patched) {
+      applog('error', new Date().toISOString(), `PATCH update failed for ${resourceId}`);
+      return res.status(500).json({ error: 'Failed to apply patch' });
+    }
+
+    // Audit log entry
+    auditLog(
+      'UPDATE',
+      'PhysicalResource',
+      patched._id,
+      username
+    );
+
+    // Kafka event envelope
+    const eventPayload = {
+      event: 'PhysicalResourcePatched',
+      id: patched._id.toString(),
+      actor: username,
+      timestamp: new Date().toISOString(),
+      before: before,
+      after: patched
+    };
+
+    applog('info', new Date().toISOString(), 'Sending Kafka PATCH event: ' + JSON.stringify(eventPayload));
+
+    // Publish to Kafka topic
+    kafkaProducer.send(
+      [{
+        topic: 'physical-resource-patch-events',
+        messages: JSON.stringify(eventPayload),
+      }],
+      (err, data) => {
+        if (err) {
+          applog('error', new Date().toISOString(), 'Kafka PATCH publish failed: ' + err.message);
+        } else {
+          applog('info', new Date().toISOString(), 'Kafka PATCH event published successfully');
+          applog('info', new Date().toISOString(), 'Kafka PATCH publish result: ' + JSON.stringify(data));
+        }
+      }
+    );
+
+    applog('info', new Date().toISOString(), `Physical resource patched: ${patched._id}`);
+    return res.json(patched);
+
+  } catch (err) {
+    applog('error', new Date().toISOString(), 'Patch physical resource failed: ' + err.message);
+    return res.status(500).json({ error: err.message });
   }
 };
