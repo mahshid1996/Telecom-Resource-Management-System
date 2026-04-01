@@ -1,0 +1,10 @@
+const mongoose = require('mongoose');
+
+beforeAll(async () => {
+  const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/resourceDB';
+  await mongoose.connect(MONGO_URI);
+});
+
+afterAll(async () => {
+  await mongoose.connection.close();
+});
