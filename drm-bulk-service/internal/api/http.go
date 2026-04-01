@@ -61,7 +61,7 @@ func withCORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
 
-		// Allow local dev origins (Vite)
+		// Allow local dev origins
 		allowed := map[string]bool{
 			"http://localhost:5173": true,
 			"http://127.0.0.1:5173": true,
@@ -119,7 +119,7 @@ func (s *Server) routes() {
 	// POST: bulk create
 	s.mux.HandleFunc("/v1/drm-bulk/resources", s.handleBulkUpload)
 
-	// POST: bulk update (implemented in bulk_update.go)
+	// POST: bulk update
 	s.mux.HandleFunc("/v1/drm-bulk/resources/update", s.handleBulkUpdateUpload)
 
 	// GET: request details OR report download
@@ -389,7 +389,7 @@ func (s *Server) handleBulkExport(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	q := r.URL.Query()
 
-	// BaseType → select collection
+	// BaseType â†’ select collection
 	baseType := q.Get("baseType")
 	if baseType == "" {
 		baseType = "LogicalResource"
