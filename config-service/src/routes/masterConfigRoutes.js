@@ -125,3 +125,4 @@ router.patch('/:id', controller.updateConfig);
 router.delete('/:id', controller.deleteConfig);
 
 module.exports = router;
+
