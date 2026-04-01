@@ -59,8 +59,8 @@ func (s *Server) handleBulkUpdateUpload(w http.ResponseWriter, r *http.Request) 
 
 	// Build BulkRequest metadata
 	req := model.BulkRequest{
-		Type:       r.FormValue("type"),     // e.g. "Router"
-		BaseType:   r.FormValue("baseType"), // "LogicalResource"
+		Type:       r.FormValue("type"),
+		BaseType:   r.FormValue("baseType"),
 		FileName:   header.Filename,
 		Status:     "pending",
 		SchemaID:   r.FormValue("schemaId"),
