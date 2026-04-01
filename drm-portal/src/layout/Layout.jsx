@@ -22,28 +22,33 @@ export default function Layout() {
 
         <div className="nav">
           <div
-            className={`navItem ${active("/create-single-resource") ? "active" : ""}`}
+            className={navItem ${active("/create-single-resource") ? "active" : ""}}
             onClick={() => nav("/create-single-resource")}
           >
             Create Single Resource
           </div>
 
           <div
-            className={`navItem ${active("/config") ? "active" : ""}`}
+            className={navItem ${active("/config") ? "active" : ""}}
             onClick={() => nav("/config")}
           >
             Config
           </div>
 
           <div
-            className={`navItem ${active("/categories") ? "active" : ""}`}
+            className={navItem ${active("/categories") ? "active" : ""}}
             onClick={() => nav("/categories")}
           >
             Categories
           </div>
-
+<div
+  className={navItem ${active("/notifications") ? "active" : ""}}
+  onClick={() => nav("/notifications")}
+>
+  Notifications
+</div>
           <div
-            className={`navItem ${active("/bulk") ? "active" : ""}`}
+            className={navItem ${active("/bulk") ? "active" : ""}}
             onClick={() => nav("/bulk")}
           >
             Bulk Operations
@@ -51,7 +56,7 @@ export default function Layout() {
 
           {/* Live Chat tab */}
           <div
-            className={`navItem ${active("/chat") ? "active" : ""}`}
+            className={navItem ${active("/chat") ? "active" : ""}}
             onClick={() => nav("/chat")}
           >
             Live Chat
