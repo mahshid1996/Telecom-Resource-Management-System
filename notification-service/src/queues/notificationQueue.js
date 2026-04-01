@@ -12,9 +12,9 @@ const notificationQueue = new Queue('notification', {
 });
 
 notificationQueue.process(async (job) => {
-  const { emailLists, body, subject, notificationId } = job.data;
+ const { emailLists, body, subject, notificationId, chunkSize } = job.data; 
   const results = [];
-  const chunkSize = config.emailChunkSize || 50;; 
+
 
   try {
     for (let i = 0; i < emailLists.length; i += chunkSize) {
