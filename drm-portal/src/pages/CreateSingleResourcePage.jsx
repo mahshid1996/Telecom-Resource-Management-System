@@ -8,6 +8,7 @@ import {
   searchLogicalResources,
   searchPhysicalResources,
 } from "../api/resources";
+import { apiWithHeaders } from "../api/client";
 
 const REFRESH_MS = 5 * 60 * 1000;
 
@@ -31,13 +32,17 @@ export default function CreateSingleResourcePage() {
   
 async function loadCounts() {
   try {
-    const [l, p] = await Promise.all([listLogicalResources(), listPhysicalResources()]);
+    const [lRes, pRes] = await Promise.all([
+      apiWithHeaders("/api/logical-resources"),
+      apiWithHeaders("/api/physical-resources")
+    ]);
 
-    const logicalItems = Array.isArray(l) ? l : (l?.items ?? []);
-    const physicalItems = Array.isArray(p) ? p : (p?.items ?? []);
+    const logicalTotal = lRes.headers.get("X-Total-Count");
+    const physicalTotal = pRes.headers.get("X-Total-Count");
 
-    setLogicalCount(logicalItems.length);
-    setPhysicalCount(physicalItems.length);
+    setLogicalCount(logicalTotal ? Number(logicalTotal) : 0);
+    setPhysicalCount(physicalTotal ? Number(physicalTotal) : 0);
+
   } catch (e) {
     setLogicalCount(null);
     setPhysicalCount(null);
