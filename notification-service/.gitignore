@@ -1,0 +1,23 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+logs/
+*.log
+
+# Coverage reports
+coverage/
+reports/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# npm
+npm-debug.log*
+
+# Jest
+jest-html-reporters-*.html
